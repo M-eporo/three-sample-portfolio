@@ -196,3 +196,37 @@ function animation(){
   requestAnimationFrame(animation);
 }
 animation();
+
+function animation() {
+  sphereGroup.rotation.x += 0.02;
+  sphereGroup.rotation.y += 0.01;
+
+  // 各球体のワールド座標を取得
+  const worldPositions = spheres.map(sphere => sphere.getWorldPosition(new THREE.Vector3()));
+
+  // 各ラインの終点を対応する球体のワールド座標に更新
+  linesGroup.children.forEach((line, i) => {
+    if (i >= worldPositions.length) return;
+    
+    const positionAttr = line.geometry.attributes.position;
+    const array = positionAttr.array;
+
+    // ラインの開始点は原点 (0,0,0)
+    array[0] = 0;
+    array[1] = 0;
+    array[2] = 0;
+
+    // ラインの終点を球体の位置に設定
+    array[3] = worldPositions[i].x;
+    array[4] = worldPositions[i].y;
+    array[5] = worldPositions[i].z;
+
+    // 更新を反映
+    positionAttr.needsUpdate = true;
+  });
+
+  camera.lookAt(new THREE.Vector3(0, 0, 0));
+  renderer.render(scene, camera);
+  requestAnimationFrame(animation);
+}
+
